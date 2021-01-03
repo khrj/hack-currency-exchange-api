@@ -1,0 +1,51 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Trade {
+    trade_id       Int         @id @default(autoincrement())
+    seller_id      Int
+    units          Int
+    from           Currency
+    to             Currency
+    seller         Token       @relation(fields: [seller_id], references: [token_id])
+    buyers         Purchase[]
+    status         TradeStatus
+    unitsRemaining Int
+    completedAt    DateTime?
+}
+
+model Token {
+    token_id     Int        @id @default(autoincrement())
+    name         String
+    value        String     @unique @default(uuid())
+    isAdminToken Boolean
+    isBotToken   Boolean
+    offers       Trade[]
+    purchases    Purchase[]
+}
+
+model Purchase {
+    purchase_id   Int   @id @default(autoincrement())
+    buyer_id      Int
+    trade_id      Int
+    buyer_token   Token @relation(fields: [buyer_id], references: [token_id])
+    trade         Trade @relation(fields: [trade_id], references: [trade_id])
+    tradeTrade_id Int
+}
+
+enum TradeStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
+}
+
+enum Currency {
+    HN
+    GP
+}
