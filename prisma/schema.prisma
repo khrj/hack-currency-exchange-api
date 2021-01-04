@@ -8,16 +8,18 @@ datasource db {
 }
 
 model Trade {
-    trade_id       Int         @id @default(autoincrement())
-    seller_id      Int
-    units          Int
-    from           Currency
-    to             Currency
-    seller         Token       @relation(fields: [seller_id], references: [token_id])
-    buyers         Purchase[]
-    status         TradeStatus
-    unitsRemaining Int
-    completedAt    DateTime?
+    trade_id           Int         @id @default(autoincrement())
+    seller_id          Int
+    units              Int
+    from               Currency
+    to                 Currency
+    currencyWhichIsOne FromOrTo
+    amountPerUnit      Int
+    seller             Token       @relation(fields: [seller_id], references: [token_id])
+    buyers             Purchase[]
+    status             TradeStatus
+    unitsRemaining     Int
+    completedAt        DateTime?
 }
 
 model Token {
@@ -48,4 +50,9 @@ enum TradeStatus {
 enum Currency {
     HN
     GP
+}
+
+enum FromOrTo {
+    FROM
+    TO
 }
