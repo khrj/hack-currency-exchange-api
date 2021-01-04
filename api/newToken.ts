@@ -5,31 +5,48 @@ const prisma = new PrismaClient()
 import { Validity, validateToken } from './validateToken'
 
 export default async function (request: NowRequest, response: NowResponse) {
-    let { makebottoken: makeBotToken, makeadmintoken: makeAdminToken, name, token } = request.headers
-    const valid = await validateToken(token as string)
+    let input
+    try {
+        input = parseHeaders(request.headers)
+    } catch (e) {
+        return response.status(400).send(e)
+    }
 
-    console.log(request.headers)
+    const valid = await validateToken(input.token as string)
+
+    if (valid !== Validity.ADMIN) {
+        return response.status(403).send("Unauthorized: Token not valid or not admin token")
+    }
 
     try {
-        makeBotToken = JSON.parse((makeBotToken as string).toLowerCase())
-        makeAdminToken = JSON.parse((makeAdminToken as string).toLowerCase())
-        if (typeof name !== "string") throw "Bad request"
+        const created = await prisma.token.create({
+            data: {
+                isAdminToken: input.makeAdminToken,
+                isBotToken: input.makeBotToken,
+                name: input.name,
+            }
+        })
 
-        if (valid === Validity.ADMIN) {
-            const created = await prisma.token.create({
-                data: {
-                    isAdminToken: makeAdminToken as unknown as boolean,
-                    isBotToken: makeBotToken as unknown as boolean,
-                    name: name as string,
-                }
-            })
-
-            response.status(201).send(created.value)
-        } else {
-            response.status(403).send("Unauthorized: Token not valid or not admin token")
-        }
+        response.status(201).send(created.value)
     } catch (e) {
-        response.status(400).send("Bad request - see documentation")
+        response.status(500).send("Unexpected error while creating token")
+    }
+}
+
+function parseHeaders({ make_bot_token: makeBotToken, make_admin_token: makeAdminToken, name, token }: any): {
+    makeBotToken: boolean,
+    makeAdminToken: boolean,
+    name: string,
+    token: string
+} {
+    if (!(makeBotToken && makeAdminToken && name && token)) throw "Bad request: Missing arguments"
+    if ((makeBotToken.toLowerCase() !== "true" && makeBotToken.toLowerCase() !== "false") || (makeAdminToken.toLowerCase() !== "true" && makeAdminToken.toLowerCase() !== "false")) throw "Bad Request: Invalid Arguments"
+
+    return {
+        makeBotToken: makeBotToken.toLowerCase() === "true",
+        makeAdminToken: makeAdminToken.toLowerCase() === "true",
+        name,
+        token
     }
 }
 
@@ -37,7 +54,7 @@ export default async function (request: NowRequest, response: NowResponse) {
 //     headers: {
 //         token: "<ADMIN-TOKEN>",
 //         name: "Khushraj Rathod",
-//         makeAdminToken: "true",
-//         makeBotToken: "false"
+//         make_admin_token: "true",
+//         make_bot_token: "false"
 //     }
 // })
