@@ -24,7 +24,7 @@ model Trade {
 
 model Token {
     token_id     Int        @id @default(autoincrement())
-    name         String
+    userID       String
     value        String     @unique @default(uuid())
     isAdminToken Boolean
     isBotToken   Boolean
