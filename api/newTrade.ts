@@ -75,7 +75,7 @@ export default async function (request: NowRequest, response: NowResponse) {
                 unitsRemaining: input.units,
                 seller: {
                     connect: {
-                        token_id: tokenObject?.token_id
+                        userID: tokenObject?.userID
                     }
                 },
                 incompleteTransactionID
