@@ -8,14 +8,14 @@ datasource db {
 }
 
 model Trade {
-    trade_id                Int         @id @default(autoincrement())
-    seller_id               Int
+    tradeID                 Int         @id @default(autoincrement())
+    sellerID                String
     units                   Int
     from                    Currency
     to                      Currency
     currencyWhichIsOne      FromOrTo
     amountPerUnit           Int
-    seller                  Token       @relation(fields: [seller_id], references: [token_id])
+    seller                  Token       @relation(fields: [sellerID], references: [userID])
     buyers                  Purchase[]
     status                  TradeStatus
     incompleteTransactionID Int?        @unique
@@ -24,8 +24,7 @@ model Trade {
 }
 
 model Token {
-    token_id     Int        @id @default(autoincrement())
-    userID       String
+    userID       String     @id
     value        String     @unique @default(uuid())
     isAdminToken Boolean
     isBotToken   Boolean
@@ -34,12 +33,11 @@ model Token {
 }
 
 model Purchase {
-    purchase_id   Int   @id @default(autoincrement())
-    buyer_id      Int
-    trade_id      Int
-    buyer_token   Token @relation(fields: [buyer_id], references: [token_id])
-    trade         Trade @relation(fields: [trade_id], references: [trade_id])
-    tradeTrade_id Int
+    purchaseID    Int    @id @default(autoincrement())
+    buyerID       String
+    partOfTradeID Int
+    buyerToken    Token  @relation(fields: [buyerID], references: [userID])
+    trade         Trade  @relation(fields: [partOfTradeID], references: [tradeID])
 }
 
 model Secret {
