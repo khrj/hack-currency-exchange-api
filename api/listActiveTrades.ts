@@ -1,5 +1,5 @@
 import { NowRequest, NowResponse } from '@vercel/node'
-import { PrismaClient, TradeStatus, Trade } from '@prisma/client'
+import { PrismaClient, TradeStatus } from '@prisma/client'
 import { Validity, validateToken } from './validateToken'
 import _ from 'lodash'
 const prisma = new PrismaClient()
