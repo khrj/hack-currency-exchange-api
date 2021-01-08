@@ -42,6 +42,11 @@ model Purchase {
     tradeTrade_id Int
 }
 
+model Secret {
+    owner String @unique
+    value String @default(uuid())
+}
+
 enum TradeStatus {
     PENDING
     IN_PROGRESS

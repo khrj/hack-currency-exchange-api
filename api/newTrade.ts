@@ -121,7 +121,7 @@ function parseHeaders({ from, to, currency_which_is_one: currencyWhichIsOne, amo
 // Total GP to be paid to market: 10 * 10 = 100
 // Total Potential HN made: 10 * 1 = 10
 
-// await fetch("http://localhost:3000/api/newTrade", {
+// await fetch("https://exchange.khushrajrathod.com/api/newTrade", {
 //     headers: {
 //         token: "<TOKEN>",
 //         from: "GP",
