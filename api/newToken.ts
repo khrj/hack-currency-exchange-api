@@ -50,7 +50,7 @@ function parseHeaders({ make_bot_token: makeBotToken, make_admin_token: makeAdmi
     }
 }
 
-// await fetch("http://localhost:3000/api/newToken", {
+// await fetch("http://exchange.khushrajrathod.com/api/newToken", {
 //     headers: {
 //         token: "<ADMIN-TOKEN>",
 //         userID: "Khushraj Rathod",
