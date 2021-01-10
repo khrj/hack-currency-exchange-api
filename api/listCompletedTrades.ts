@@ -24,6 +24,7 @@ export default async (request: NowRequest, response: NowResponse) => {
     const toReturn = trades.map(trade => {
         return _.pick(trade,
             [
+                'tradeID',
                 'sellerID',
                 'units',
                 'from',
