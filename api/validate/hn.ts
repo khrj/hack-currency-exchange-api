@@ -3,7 +3,6 @@ import { PrismaClient, TradeStatus } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export default async (request: NowRequest, response: NowResponse) => {
-    console.log(request.body)
     const secret = await prisma.secret.findUnique({
         where: {
             owner: "hn"
