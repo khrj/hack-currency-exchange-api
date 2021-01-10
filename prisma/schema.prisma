@@ -33,12 +33,14 @@ model Token {
 }
 
 model Purchase {
-    purchaseID    Int       @id @default(autoincrement())
-    buyerID       String
-    partOfTradeID Int
-    buyerToken    Token     @relation(fields: [buyerID], references: [userID])
-    trade         Trade     @relation(fields: [partOfTradeID], references: [tradeID])
-    completedAt   DateTime
+    purchaseID              Int      @id @default(autoincrement())
+    buyerID                 String
+    partOfTradeID           Int
+    buyerToken              Token    @relation(fields: [buyerID], references: [userID])
+    trade                   Trade    @relation(fields: [partOfTradeID], references: [tradeID])
+    units                   Int
+    incompleteTransactionID Int
+    completedAt             DateTime
 }
 
 model Secret {
