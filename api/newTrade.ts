@@ -43,8 +43,8 @@ export default async function (request: NowRequest, response: NowResponse) {
 
         switch (input.from) {
             case Currency.HN:
-                const response = await axios.post('https://hn.rishi.cx', {
-                    query: queryData.replace(/\s/g, ''),
+                const response = await axios.post(process.env.HN_URL!, {
+                    query: queryData,
                     variables: {
                         amount: input.currencyWhichIsOne === FromOrTo.FROM ? input.units : input.units * input.amountPerUnit,
                         user: tokenObject!.userID
