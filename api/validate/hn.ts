@@ -1,5 +1,5 @@
 import { NowRequest, NowResponse } from '@vercel/node'
-import { PrismaClient, TradeStatus } from '@prisma/client'
+import { PrismaClient, TradeStatus, PurchaseStatus } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export default async (request: NowRequest, response: NowResponse) => {
@@ -13,21 +13,68 @@ export default async (request: NowRequest, response: NowResponse) => {
         return response.status(403).send("Forbidden")
     }
 
-    let validatedID
-    try {
-        validatedID = parseInt(request.body.body.id)
-    } catch (e) {
-        return response.status(400).send(e)
+    if (typeof request.body.body.id !== "string") {
+        return response.status(400).send("Bad ID")
     }
 
-    await prisma.trade.update({
+    const validatedID = request.body.body.id
+
+    const purchase = await prisma.purchase.findUnique({
         where: {
             incompleteTransactionID: validatedID
-        },
-        data: {
-            status: TradeStatus.IN_PROGRESS
         }
     })
+
+    if (purchase) {
+        await prisma.purchase.update({
+            where: {
+                incompleteTransactionID: validatedID,
+            },
+            data: {
+                status: PurchaseStatus.COMPLETED,
+                completedAt: new Date(),
+            }
+        })
+
+        const parentTrade = await prisma.trade.findUnique({
+            where: {
+                tradeID: purchase.partOfTradeID
+            }
+        })
+
+        const unitsRemainingAfterPurchase = parentTrade?.unitsRemaining! - purchase.units
+
+        if (unitsRemainingAfterPurchase > 0) {
+            await prisma.trade.update({
+                where: {
+                    tradeID: parentTrade?.tradeID
+                },
+                data: {
+                    unitsRemaining: unitsRemainingAfterPurchase,
+                    status: TradeStatus.IN_PROGRESS
+                }
+            })
+        } else if (unitsRemainingAfterPurchase === 0) {
+            await prisma.trade.update({
+                where: {
+                    tradeID: parentTrade?.tradeID
+                },
+                data: {
+                    unitsRemaining: unitsRemainingAfterPurchase,
+                    status: TradeStatus.COMPLETED
+                }
+            })
+        }
+    } else {
+        await prisma.trade.update({
+            where: {
+                incompleteTransactionID: validatedID
+            },
+            data: {
+                status: TradeStatus.IN_PROGRESS
+            }
+        })
+    }
 
     response.status(200).send("OK")
 }

@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    url      = env("DATABASE_URL")
+    // url   = env("DATABASE_URL")
+    url      = "postgres://khushrajrathod:@localhost:5432/khushrajrathod"
 }
 
 model Trade {
@@ -18,7 +19,7 @@ model Trade {
     seller                  Token       @relation(fields: [sellerID], references: [userID])
     buyers                  Purchase[]
     status                  TradeStatus
-    incompleteTransactionID Int?        @unique
+    incompleteTransactionID String?        @unique
     unitsRemaining          Int
     completedAt             DateTime?
 }
@@ -33,14 +34,15 @@ model Token {
 }
 
 model Purchase {
-    purchaseID              Int      @id @default(autoincrement())
+    purchaseID              Int            @id @default(autoincrement())
     buyerID                 String
     partOfTradeID           Int
-    buyerToken              Token    @relation(fields: [buyerID], references: [userID])
-    trade                   Trade    @relation(fields: [partOfTradeID], references: [tradeID])
+    buyerToken              Token          @relation(fields: [buyerID], references: [userID])
+    trade                   Trade          @relation(fields: [partOfTradeID], references: [tradeID])
     units                   Int
-    incompleteTransactionID Int
-    completedAt             DateTime
+    incompleteTransactionID String?           @unique
+    status                  PurchaseStatus @default(PENDING)
+    completedAt             DateTime?
 }
 
 model Secret {
@@ -51,6 +53,11 @@ model Secret {
 enum TradeStatus {
     PENDING
     IN_PROGRESS
+    COMPLETED
+}
+
+enum PurchaseStatus {
+    PENDING
     COMPLETED
 }
 

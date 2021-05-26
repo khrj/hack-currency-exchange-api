@@ -39,7 +39,7 @@ export default async function (request: NowRequest, response: NowResponse) {
             }
         `
 
-        let incompleteTransactionID: number
+        let incompleteTransactionID: string
 
         switch (input.from) {
             case Currency.HN:
@@ -56,11 +56,11 @@ export default async function (request: NowRequest, response: NowResponse) {
                 })
 
                 const body = response.data
-                incompleteTransactionID = parseInt(body.data.transact.id)
+                incompleteTransactionID = body.data.transact.id
                 break
             case Currency.GP:
                 // TODO
-                incompleteTransactionID = -1
+                incompleteTransactionID = "todo"
                 break
         }
 
